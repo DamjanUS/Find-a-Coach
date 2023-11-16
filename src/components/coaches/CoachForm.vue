@@ -1,49 +1,49 @@
 <template>
   <form @submit.prevent="submitForm">
-    <div
-      class="form-control"
-      :class="{ invalid: !formWatch.firstName.isValid }"
-    >
+    <div class="form-control" :class="{invalid: !firstName.isValid}">
       <label for="firstname">Firstname</label>
       <input
         type="text"
         id="firstname"
-        v-model.trim="formWatch.firstName.val"
+        v-model.trim="firstName.val"
+        @blur="clearValidity('firstName')"
       />
-      <p v-if="!formWatch.firstName.isValid">Firstname must not be empty.</p>
+      <p v-if="!firstName.isValid">Firstname must not be empty.</p>
     </div>
-    <div class="form-control" :class="{ invalid: !formWatch.lastName.isValid }">
+    <div class="form-control" :class="{invalid: !lastName.isValid}">
       <label for="lastname">Lastname</label>
-      <input type="text" id="lastname" v-model.trim="formWatch.lastName.val" />
-      <p v-if="!formWatch.lastName.isValid">Lastname must not be empty.</p>
+      <input
+        type="text"
+        id="lastname"
+        v-model.trim="lastName.val"
+        @blur="clearValidity('lastName')"
+      />
+      <p v-if="!lastName.isValid">Lastname must not be empty.</p>
     </div>
-    <div
-      class="form-control"
-      :class="{ invalid: !formWatch.description.isValid }"
-    >
+    <div class="form-control" :class="{invalid: !description.isValid}">
       <label for="description">Description</label>
       <textarea
         id="description"
         rows="5"
-        v-model.trim="formWatch.description.val"
+        v-model.trim="description.val"
+        @blur="clearValidity('description')"
       ></textarea>
-      <p v-if="!formWatch.description.isValid">
-        Description must not be empty.
-      </p>
+      <p v-if="!description.isValid">Description must not be empty.</p>
     </div>
-    <div class="form-control" :class="{ invalid: !formWatch.rate.isValid }">
+    <div class="form-control" :class="{invalid: !rate.isValid}">
       <label for="rate">Hourly Rate</label>
-      <input type="number" id="rate" v-model.number="formWatch.rate.val" />
-      <p v-if="!formWatch.rate.isValid">Rate must be greater than 0.</p>
+      <input type="number" id="rate" v-model.number="rate.val" @blur="clearValidity('rate')" />
+      <p v-if="!rate.isValid">Rate must be greater than 0.</p>
     </div>
-    <div class="form-control" :class="{ invalid: !formWatch.areas.isValid }">
+    <div class="form-control" :class="{invalid: !areas.isValid}">
       <h3>Areas of Expertise</h3>
       <div>
         <input
           type="checkbox"
           id="frontend"
           value="frontend"
-          v-model="formWatch.areas.val"
+          v-model="areas.val"
+          @blur="clearValidity('areas')"
         />
         <label for="frontend">Frontend Development</label>
       </div>
@@ -52,7 +52,8 @@
           type="checkbox"
           id="backend"
           value="backend"
-          v-model="formWatch.areas.val"
+          v-model="areas.val"
+          @blur="clearValidity('areas')"
         />
         <label for="backend">Backend Development</label>
       </div>
@@ -61,13 +62,12 @@
           type="checkbox"
           id="career"
           value="career"
-          v-model="formWatch.areas.val"
+          v-model="areas.val"
+          @blur="clearValidity('areas')"
         />
         <label for="career">Career Advisory</label>
       </div>
-      <p v-if="!formWatch.areas.isValid">
-        At least one expertise must be selected.
-      </p>
+      <p v-if="!areas.isValid">At least one expertise must be selected.</p>
     </div>
     <p v-if="!formIsValid">Please fix the above errors and submit again.</p>
     <base-button>Register</base-button>
@@ -79,79 +79,53 @@ export default {
   emits: ['save-data'],
   data() {
     return {
-      formWatch: {
-        firstName: {
-          val: '',
-          isValid: true,
-        },
-        lastName: {
-          val: '',
-          isValid: true,
-        },
-        description: {
-          val: '',
-          isValid: true,
-        },
-        rate: {
-          val: null,
-          isValid: true,
-        },
-        areas: {
-          val: [],
-          isValid: true,
-        },
+      firstName: {
+        val: '',
+        isValid: true,
+      },
+      lastName: {
+        val: '',
+        isValid: true,
+      },
+      description: {
+        val: '',
+        isValid: true,
+      },
+      rate: {
+        val: null,
+        isValid: true,
+      },
+      areas: {
+        val: [],
+        isValid: true,
       },
       formIsValid: true,
     };
   },
-  watch: {
-    'formWatch.firstName.val': {
-      handler(newVal) {
-        this.formWatch.firstName.isValid = newVal !== '';
-      },
-    },
-    'formWatch.lastName.val': {
-      handler(newVal) {
-        this.formWatch.lastName.isValid = newVal !== '';
-      },
-    },
-    'formWatch.description.val': {
-      handler(newVal) {
-        this.formWatch.description.isValid = newVal !== '';
-      },
-    },
-    'formWatch.rate.val': {
-      handler(newVal) {
-        this.formWatch.rate.isValid = newVal !== null && newVal >= 0;
-      },
-    },
-    'formWatch.areas.val': {
-      handler(newVal) {
-        this.formWatch.areas.isValid = newVal.length > 0;
-      },
-    },
-  },
   methods: {
+    clearValidity(input) {
+      this[input].isValid = true;
+    },
     validateForm() {
       this.formIsValid = true;
-      if (this.formWatch.firstName.val === '') {
-        this.formWatch.firstName.isValid = false;
+      if (this.firstName.val === '') {
+        this.firstName.isValid = false;
         this.formIsValid = false;
       }
-      if (this.formWatch.lastName.val === '') {
-        this.formWatch.lastName.isValid = false;
+      if (this.lastName.val === '') {
+        this.lastName.isValid = false;
         this.formIsValid = false;
       }
-      if (this.formWatch.description.val === '') {
-        this.formWatch.description.isValid = false;
+      if (this.description.val === '') {
+        this.description.isValid = false;
         this.formIsValid = false;
       }
-      if (!this.formWatch.rate.val || this.formWatch.rate.val < 0) {
-        this.formWatch.rate.isValid = false;
+      if (!this.rate.val || this.rate.val < 0) {
+        this.rate.isValid = false;
         this.formIsValid = false;
       }
-      if (this.formWatch.areas.val.length === 0) {
-        this.formWatch.areas.isValid = false;
+      if (this.areas.val.length === 0) {
+        this.areas.isValid = false;
         this.formIsValid = false;
       }
     },
@@ -163,11 +137,11 @@ export default {
       }
 
       const formData = {
-        first: this.formWatch.firstName.val,
-        last: this.formWatch.lastName.val,
-        desc: this.formWatch.description.val,
-        rate: this.formWatch.rate.val,
-        areas: this.formWatch.areas.val,
+        first: this.firstName.val,
+        last: this.lastName.val,
+        desc: this.description.val,
+        rate: this.rate.val,
+        areas: this.areas.val,
       };
 
       this.$emit('save-data', formData);
